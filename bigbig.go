@@ -41,7 +41,8 @@ type fileSize struct {
 }
 
 func (f fileSize) String() string {
-	return fmt.Sprintf("%s\t%s\t%s\t", f.byteSize.String(), filepath.Ext(f.path), f.path)
+	p, _ := filepath.Abs(f.path) // TODO(aoeu): Handle potential errors.
+	return fmt.Sprintf("%s\t%s\t%s\t", f.byteSize.String(), filepath.Ext(f.path), p)
 }
 
 type fileSizes []fileSize
@@ -59,10 +60,13 @@ func main() {
 		num          int
 		rightjustify bool
 	}{}
-	flag.StringVar(&args.root, "root", "/", "The root directory to run from.")
+	flag.StringVar(&args.root, "root", "", "The root directory to run from.")
 	flag.IntVar(&args.num, "top", 10, "The top number of files to output.")
 	flag.BoolVar(&args.rightjustify, "rightjustify", false, "Align file paths to the right in output")
 	flag.Parse()
+	if wd, err := os.Getwd(); args.root == "" && err == nil {
+		args.root = wd
+	}
 
 	tabw = new(tabwriter.Writer)
 	tabw.Init(os.Stdout, 8, 0, 1, ' ', tabwriter.AlignRight)
@@ -95,6 +99,6 @@ func mark(path string, info os.FileInfo, err error) error {
 	if err != nil {
 		return err
 	}
-	allFileSizes = append(allFileSizes, fileSize{path + info.Name(), byteSize(info.Size())})
+	allFileSizes = append(allFileSizes, fileSize{path, byteSize(info.Size())})
 	return nil
 }
