@@ -60,7 +60,7 @@ func main() {
 		rightjustify bool
 	}{}
 	flag.StringVar(&args.root, "root", "/", "The root directory to run from.")
-	flag.IntVar(&args.num, "num", 10, "The top number of files to output.")
+	flag.IntVar(&args.num, "top", 10, "The top number of files to output.")
 	flag.BoolVar(&args.rightjustify, "rightjustify", false, "Align file paths to the right in output")
 	flag.Parse()
 
