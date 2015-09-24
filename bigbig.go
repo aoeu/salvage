@@ -85,7 +85,11 @@ func main() {
 }
 
 func mark(path string, info os.FileInfo, err error) error {
-	if info.IsDir() || err == os.ErrPermission {
+	if info == nil || info.IsDir() {
+		return nil
+	}
+	if err == os.ErrPermission {
+		fmt.Fprintf(os.Stderr, "No permission to determine size of: '%v'\n", path)
 		return nil
 	}
 	if err != nil {
